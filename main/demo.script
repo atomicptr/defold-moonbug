@@ -1,0 +1,15 @@
+function init(self)
+    self.counter = 1
+
+    msg.post(".", "acquire_input_focus")
+end
+
+function on_input(self, action_id, action)
+    if action.pressed and action_id == hash "clicked" then
+        self.counter = self.counter + 1
+
+        -- you could set a breakpoint here to test the feature :)
+        print(string.format("Clicked! New Counter Is: %i", self.counter))
+        label.set_text("#label", string.format("Counter: %i", self.counter))
+    end
+end
