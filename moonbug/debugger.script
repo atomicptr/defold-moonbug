@@ -24,7 +24,7 @@ function init(self)
 
     print(string.format("Debugger has been enabled on port %d", self.port))
 
-    moonbug.listen(nil, self.port, {
+    moonbug.listen(nil, tonumber(os.getenv "MOONBUG_PORT") or self.port, {
         wait = self.wait,
         stop_on_entry = self.stop_on_entry,
         stop_on_attach = self.stop_on_attach,
