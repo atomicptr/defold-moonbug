@@ -63,6 +63,16 @@ And now select the **\/moonbug\/debugger.go** file
 
 ![Select \/moonbug\/debugger.go](./.github/install02.png)
 
+The debugger gets loaded automatically unless you disable the `enable_debugger` property. You can enable the debugger at runtime via sending a message, see below.
+
+![See the properties](./.github/install03.png)
+
+**Note**: The debugger is automatically disabled in `release` builds unless you explicitly tick the `allow_in_release_builds` property OR you send a message to the debugger like this:
+
+```lua
+msg.post("/debugger", "enable_debugger")
+```
+
 ## License
 
 MIT

@@ -3,22 +3,27 @@ local moonbug = require "moonbug.moonbug"
 moonbug.compat.libs.socket = require "builtins.scripts.socket"
 moonbug.compat.log_print = pprint
 
+local is_debug = sys.get_engine_info().is_debug
+
 go.property("enable_debugger", true)
+go.property("allow_in_release_builds", false)
 go.property("port", 8888)
 go.property("wait", false)
 go.property("stop_on_entry", false)
 go.property("stop_on_attach", false)
 
 ---@class Debugger
----@field enable_debugger boolean Enable the debugger
----@field port            integer The debugger port
----@field wait            boolean Block until debugger attaches
----@field stop_on_entry   boolean Stop the process when debugger configuration is done
----@field stop_on_attach  boolean Stop the process when debugger attaches
+---@field enable_debugger         boolean Enable the debugger
+---@field allow_in_release_builds boolean Allow moonbug to load on release builds
+---@field port                    integer The debugger port
+---@field wait                    boolean Block until debugger attaches
+---@field stop_on_entry           boolean Stop the process when debugger configuration is done
+---@field stop_on_attach          boolean Stop the process when debugger attaches
+---@field was_enabled?            boolean Debugger was already enabled
 
 ---@param self Debugger
-function init(self)
-    if not self.enable_debugger then
+local function enable_debugger(self)
+    if self.was_enabled then
         return
     end
 
@@ -29,4 +34,30 @@ function init(self)
         stop_on_entry = self.stop_on_entry,
         stop_on_attach = self.stop_on_attach,
     })
+
+    self.was_enabled = true
+end
+
+---@param self Debugger
+function init(self)
+    if not self.enable_debugger then
+        return
+    end
+
+    -- in debug mode don't load the debugger automatically (unless explicitly allowed)
+    if not is_debug and not self.allow_in_release_builds then
+        return
+    end
+
+    enable_debugger(self)
+end
+
+---@param self       Debugger
+---@param message_id hash
+---@param message    table
+---@param sender     url
+function on_message(self, message_id, message, sender)
+    if message_id == hash "enable_debugger" then
+        enable_debugger(self)
+    end
 end
